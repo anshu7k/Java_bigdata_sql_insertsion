@@ -1,17 +1,21 @@
 package Model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+
 public class App {
+	static JDBCHelper jdbc;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		CSVScanner cv =new CSVScanner("C:\\Users\\Subhanshu\\Downloads\\US_Accidents_May19.csv");
-		String col =cv.nextattr();
-		System.out.println(col);
-		JDBCHelper jdbc= new JDBCHelper();
+		CSVScanner cv =new CSVScanner("C:\\Users\\Subhanshu\\Downloads\\abc.csv");
+		jdbc= new JDBCHelper();
 		jdbc.createConnection();
-		jdbc.createTable();
-		//jdbc.connectionClose();
+		System.out.println(Arrays.toString(cv.column)+cv.col_len);
+		jdbc.createTable("Stud1",cv.column,cv.col_len);
 		jdbc.startBatch();
+		//jdbc.connectionClose();
 		String rows=null;
 		while(true) {
 			for(int i=0;i<300000;i++) {
@@ -24,8 +28,10 @@ public class App {
 				}
 				if(rows !=null) {
 				String[] arrOfstr = rows.split(",");
-				if(arrOfstr.length==49) {
-					jdbc.processBatch(arrOfstr);	
+				if(arrOfstr.length==cv.col_len) {
+					System.out.println(Arrays.toString(arrOfstr));
+					jdbc.processBatch(arrOfstr);
+					
 				}
 				else{
 					System.out.println("record invalid, length of record :"+arrOfstr.length);	
@@ -43,8 +49,26 @@ public class App {
 			jdbc.executeBatch();
 			
 		}
-			
-			
+		analytics();
+				
+	}
+	
+	static void analytics() {
+		System.out.println("inside analytics");
+		String sql ="select severity,count(*) from accident group by Severity;";
+		ResultSet rs=jdbc.fetch(sql);
+		try {
+			while(rs.next()) {
+				System.out.print(rs.getInt(1)+" "+rs.getInt(2));
+				System.out.println("");
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 		
 }

@@ -17,6 +17,8 @@ public class JDBCHelper {
 	PreparedStatement pst;
 	CallableStatement cst;
 	String sql=null;
+	String table_name = null;
+	int col_len;
 	public JDBCHelper() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -40,11 +42,13 @@ public class JDBCHelper {
 		
 	}
 	
-	void createTable() {
+	void createTable(String table_name,String[] column,int col_len) {
+		this.table_name = table_name;
+		this.col_len =col_len;
 		try {
 			System.out.println("Deleting table if any...");
 		      st = con.createStatement();
-		      String sql = "DROP TABLE accident ";
+		      String sql = "DROP TABLE "+ table_name;
 		      st.executeUpdate(sql);
 		      System.out.println("Table  deleted in given database...");  	
 		}catch(SQLException se){
@@ -56,59 +60,19 @@ public class JDBCHelper {
 		try {
 			st = con.createStatement();
 			//+ "serial_no INTEGER  not null AUTO_INCREMENT, " +
-			String sql = "CREATE TABLE Accident " +
-	                   "("
-	                   
-	                   +"id VARCHAR(10) not NULL, " +
-	                   " Source VARCHAR(255), " + 
-	                   " TMC VARCHAR(255), " + 
-	                   " Severity INTEGER, " + 
-	                   "Start_Time VARCHAR(255),"+
-	                   "End_Time_Time VARCHAR(255),"+
-	                   "Start_Lat VARCHAR(255),"+
-	                   "Start_Lng VARCHAR(255),"+
-	                   "End_Lat VARCHAR(255),"+
-	                   "End_Lng VARCHAR(255),"+
-	                   "Distance VARCHAR(255),"+
-	                   "Description TEXT,"+
-	                   "Number VARCHAR(255),"+
-	                   "Street VARCHAR(255),"+
-	                   "Side VARCHAR(255),"+
-	                   "City VARCHAR(255),"+
-	                   "County VARCHAR(255),"+
-	                   "State VARCHAR(255),"+
-	                   "Zipcode VARCHAR(255),"+
-	                   "Country VARCHAR(255),"+
-	                   "Timezone VARCHAR(255),"+
-	                   "Airport_Code VARCHAR(255),"+
-	                   "Weather_Timestamp VARCHAR(255),"+
-	                   "Temperature VARCHAR(10),"+
-	                   "Wind_Chill VARCHAR(255),"+
-	                   "Humidity VARCHAR(255),"+
-	                   "Pressure VARCHAR(255),"+
-	                   "Visibility VARCHAR(255),"+
-	                   "Wind_Direction VARCHAR(255),"+
-	                   "Wind_Speed VARCHAR(255),"+
-	                   "Precipitation VARCHAR(255),"+
-	                   "Weather_Condition VARCHAR(255),"+
-	                   "Amenity VARCHAR(255),"+
-	                   "Bump VARCHAR(255),"+
-	                   "Crossing VARCHAR(255),"+
-	                   "Give_Way VARCHAR(255),"+
-	                   "Junction VARCHAR(255),"+
-	                   "No_Exit VARCHAR(255),"+
-	                   "Railway VARCHAR(255),"+
-	                   "Roundabout VARCHAR(255),"+
-	                   "Station VARCHAR(255),"+
-	                   "Stop VARCHAR(255),"+
-	                   "Traffic_Calming VARCHAR(255),"+
-	                   "Traffic_Signal VARCHAR(255),"+
-	                   "Turning_Loop VARCHAR(255),"+
-	                   "Sunrise_Sunset VARCHAR(255),"+
-	                   "Civil_Twilight VARCHAR(255),"+
-	                   "Nautical_Twilight VARCHAR(255),"+
-	                   "Astronomical_Twilight VARCHAR(255),"+
-	                   " PRIMARY KEY ( ID))"; 
+			String sql = "CREATE TABLE "+ table_name +"(";
+				for(int i=0;i<col_len;i++) {
+					String col_name= new Temp().manupulation(column[i],i);
+					System.out.println(col_name);
+					if(i==col_len-1) {
+						sql=sql.concat(col_name + " TEXT)");
+					}
+					else {
+						sql=sql.concat(col_name + " TEXT,");
+						
+					}
+				}
+				
 			System.out.println(sql);
 
 			st.executeUpdate(sql);
@@ -123,20 +87,41 @@ public class JDBCHelper {
 	
 	void startBatch() {
 		try {
-			sql = "insert into Accident values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			String temp="";
+			int i=0;
+			//System.out.println(i);
+			while(true){
+				System.out.println(col_len);
+				if(i==col_len-1) {
+					//System.out.println(i);
+					temp=temp.concat("?)");
+					break;
+						
+				}
+				else {
+					//System.out.println("else1");
+					temp=temp.concat("?,");
+					//System.out.println("else2");
+					i++;
+					//System.out.println("else3");
+				}
+			}
+			sql = "insert into " + table_name+" values("+temp+";";
+			
+			System.out.println(sql);
 			pst =con.prepareStatement(sql);
+			System.out.println("Statement prepared complete");
+			
 		}catch(Exception e) {
 			System.out.println(e);
 			
-		}}
+		 }
+	}
 	void processBatch(String s[]) {
 		try {
-			for(int i=0;i<49;i++) {
+			for(int i=0;i<col_len;i++) {
 				pst.setString(i+1, s[i]);
-				//System.out.println(s[i]+""+i);
 			}
-			pst.setInt(4, (int)Float.parseFloat(s[3]));
-			//System.out.println(pst.toString());
 			pst.addBatch();
 			con.setAutoCommit(false);
 			//System.out.println("batch added");	
@@ -178,5 +163,33 @@ public class JDBCHelper {
 			System.out.println("error in closing sql connection :"+ e);
 		}
 	}
+	
+	public ResultSet fetch(String sql) {
+		ResultSet rs = null;
+		try {
+			pst =con.prepareStatement(sql);
+			
+			rs = pst.executeQuery();
+			System.out.println("Query executed sucessfully");
+			return rs;
+		/*	Student temp = new Student();
+			while(rs.next()) {
+				temp.rollno = rs.getInt(1);
+				temp.name = rs.getString(2);
+				temp.email = rs.getString(3);
+				temp.address = rs.getString(4);
+				temp.age= (byte)rs.getInt(5);
+				System.out.println(temp.toString());
+			}*/
+			
+			
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			return rs;
+		}
+		
+	}
+	
 
 }
