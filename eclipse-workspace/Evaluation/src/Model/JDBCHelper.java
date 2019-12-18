@@ -7,8 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-
+import java.time.LocalTime; 
 
 public class JDBCHelper {
 	
@@ -17,8 +16,8 @@ public class JDBCHelper {
 	PreparedStatement pst;
 	CallableStatement cst;
 	String sql=null;
-	String table_name = null;
-	int col_len;
+	static String table_name = null;
+	static int col_len;
 	public JDBCHelper() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
@@ -31,6 +30,7 @@ public class JDBCHelper {
 	}
 	
 	public void createConnection() {
+		System.out.println("Inside create connection");
 		try {
 			String url ="jdbc:mysql://localhost/Demo";
 			String user = "root";
@@ -63,7 +63,7 @@ public class JDBCHelper {
 			String sql = "CREATE TABLE "+ table_name +"(";
 				for(int i=0;i<col_len;i++) {
 					String col_name= new Temp().manupulation(column[i],i);
-					System.out.println(col_name);
+					//System.out.println(col_name);
 					if(i==col_len-1) {
 						sql=sql.concat(col_name + " TEXT)");
 					}
@@ -131,9 +131,13 @@ public class JDBCHelper {
 		}
 		
 	}		
-	void executeBatch() {
+	void  executeBatch() {
 		try {
+			LocalTime myObj = LocalTime.now();
+		    System.out.println(myObj);
 			pst.executeBatch();
+			LocalTime myObj1 = LocalTime.now();
+		    System.out.println(myObj1);
 			//System.out.println(pst.getUpdateCount());
 			con.commit();
 			System.out.println("commeted sucessfully");

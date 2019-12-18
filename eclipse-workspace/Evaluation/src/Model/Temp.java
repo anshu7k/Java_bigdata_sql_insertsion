@@ -1,6 +1,6 @@
 package Model;
 
-public class Temp {
+public class Temp extends Thread {
 
 	public String manupulation(String col_name, int num) {
 		col_name = col_name.trim();
@@ -13,4 +13,6 @@ public class Temp {
 		
 	return col_name;	
 	}
+	
+	
 }
