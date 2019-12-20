@@ -4,5 +4,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Subhanshu/Downloads/opencsv-5.0.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files (x86)/MySQL/Connector J 8.0/mysql-connector-java-8.0.17.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Subhanshu/Downloads/c3p0-0.9.5.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Subhanshu/Downloads/c3p0-oracle-thin-extras-0.9.5.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Subhanshu/Downloads/mchange-commons-java-0.2.19.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
